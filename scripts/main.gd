@@ -288,7 +288,12 @@ func _ready():
 
 	current_stage = way[current_key]
 
-	calc_resources(current_stage["resources"]);
+	calc_resources({
+		'money'   : 10,
+		'loyalty' : 10,
+		'army'    : 10,
+		'armor'   : 10,
+	});
 
 	print_text();
 
@@ -312,7 +317,7 @@ func next_question(answer):
 	
 	current_key = current_stage[answer];
 	
-
+	print(current_state);
 	if(current_state   == "war"):
 		next_war_question(current_key);
 	elif(current_state == "build"):
@@ -320,7 +325,7 @@ func next_question(answer):
 	else:
 		if(current_key  == "war"):
 
-			current_stage = "war";	
+			current_state = "war";	
 			current_stage = war_way[0];
 			get_node("war_hud").show();
 			get_node("peace_hud").hide();
@@ -333,24 +338,26 @@ func next_question(answer):
 			get_buildings();
 
 		else:
-
-			current_stage = way[current_key];
-							
-			if(current_stage.has("resources")):
-				calc_resources(current_stage["resources"]);
-
-			if(current_stage.has("unbuild")):
-				unbuild(current_stage["unbuild"]);
-					
-			print_text();
-			
-			if(current_stage.has("new_season")):
-				next_season();
 			if(season == 4):
-				random_event();		
+				random_event();
+			else:
+				current_stage = way[current_key];
+	
+	if(current_stage.has("resources")):
+		calc_resources(current_stage["resources"]);
+
+	if(current_stage.has("unbuild")):
+		unbuild(current_stage["unbuild"]);
+			
+	print_text();
+	
+	if(current_stage.has("new_season")):
+		next_season();
+			
 	pass
 
 func next_war_question(current_key):
+	print(current_key);
 	if(current_key == "attack"):
 		enemy_defense = enemy_defense - resources["army"];
 	if(current_key == "defense"):
@@ -373,7 +380,7 @@ func print_text():
 
 	set_process_input(false)
 
-	var nodeLabel = get_node("label");
+	var nodeLabel = get_node("main_text");
 	nodeLabel.set_visible_characters(-1)
 	label = nodeLabel.set_text(current_stage["text"]);
 	while nodeLabel.get_total_character_count() > nodeLabel.get_visible_characters():

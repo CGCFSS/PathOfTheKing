@@ -239,7 +239,6 @@ __meta__ = { "_edit_lock_":true }
 
 [node name="war_hud" type="Control" parent="."]
 
-editor/display_folded = true
 visibility/visible = false
 focus/ignore_mouse = false
 focus/stop_mouse = true
