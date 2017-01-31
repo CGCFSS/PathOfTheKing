@@ -231,6 +231,28 @@ var war_way = {
 						'right' 	 : 'defense',
 						"new_season" : 1,
 					},
+				'win' : {
+						"text"       : "Congratulations, my lord, we won!", 
+						"left_text"  : "Hooray!",
+						"right_text" : "Violence is a bad thing.",
+						'left'  	 : 0,
+						'right' 	 : 0,
+						"resources" : {
+					    	"money"   : "+50",
+					    	"loyalty" : "+50",
+					    	"army"	  : "+10",
+				    		"armor"   : "+10"
+						  },
+						"new_season" : 1,
+					},
+				'fall' : {
+						"text"       : "We were defeated, my lord ...", 
+						"left_text"  : "Oh!",
+						"right_text" : "Oh!",
+						'left'  	 : 0,
+						'right' 	 : 0,
+						"new_season" : 1,
+					},
 			};
 
 var buildings = {
@@ -239,14 +261,16 @@ var buildings = {
 			"node"		: "forge",
 			"name"		: "Forge",
 			"resources" : {
-				    		"money" : "-50",
+				    		"money" : "-25",
+				    		"army"	: "+25"
 					  	  },
 		},
 		'moat' : {
 			"node"		: "moat",
 			"name"		: "Moat",
 			"resources" : {
-				    		"money" : "-50",
+				    		"money" : "-25",
+				    		"armor"	: "+25"
 					  	  },
 		},
 		'tower' : {
@@ -254,6 +278,8 @@ var buildings = {
 			"name"		: "Tower",
 			"resources" : {
 				    		"money" : "-50",
+				    		"army"	: "+25",
+				    		"armor"	: "+25"
 					  	  },
 	    },
 	},
@@ -262,24 +288,24 @@ var buildings = {
 			"node"		: "village",
 			"name"		: "Village",
 			"resources" : {
-					    	"money" : "-50",
-					    	"loyalty" : "+50",
+					    	"money" : "-15",
+					    	"loyalty" : "+15",
 						  },
 		},
 		'windmill' : {
 			"node"		: "windmill",
 			"name"		: "Windmill",
 			"resources" : {
-					    	"money" : "-50",
-					    	"loyalty" : "+50",
+					    	"money" : "-25",
+					    	"loyalty" : "+25",
 						  },
 		},
 		'market' : {
 			"node"		: "market",
 			"name"		: "Market",
 			"resources" : {
-					    	"money" : "-50",
-					    	"loyalty" : "+50",
+					    	"money" : "-35",
+					    	"loyalty" : "+35",
 						  },
 		},
 	},
@@ -354,6 +380,7 @@ func next_question(answer):
 		next_war_question(current_key);
 	elif(current_state == "build"):
 		build(current_key);
+		get_node("hammer_player").play("hammering");
 		current_state = "peace";
 		random_event();
 	else:
@@ -361,6 +388,7 @@ func next_question(answer):
 
 			current_state = "war";	
 			current_stage = war_way[0];
+			get_node("sword_player").play("sword");
 			get_node("war_hud").show();
 			get_node("peace_hud").hide();
 			get_node("war_hud").get_node("enemy_power").set_text(str(enemy_power));
@@ -400,13 +428,23 @@ func next_war_question(current_key):
 	
 	get_node("war_hud").get_node("enemy_power").set_text(str(enemy_power));
 	get_node("war_hud").get_node("enemy_defense").set_text(str(enemy_defense));
+	get_node("army").set_text(str(resources["army"]));
+	get_node("armor").set_text(str(resources["armor"]));
+	if(resources["armor"] <= 0):
+		get_node("war_hud").hide();
+		get_node("peace_hud").show();
+		current_state = "peace";
+		current_stage = war_way["fall"];
+		enemy_defense = 100;
+		enemy_power   = 100;
 	if(enemy_defense <= 0):
 		get_node("war_hud").hide();
 		get_node("peace_hud").show();
 		current_state = "peace";
-		current_stage = way[0];
+		current_stage = war_way["win"];
 		enemy_defense = 100;
-		enemy_defense = 100;
+		enemy_power   = 100;
+		calc_resources(war_way["win"]["resources"])
 
 	print_text();
 	pass
