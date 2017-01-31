@@ -341,7 +341,8 @@ func _ready():
 	screen_size = get_viewport_rect().size
 	timer 	    = get_node("text_timer");
 
-	
+	get_node("soundtrack").play();
+
 	set_fixed_process(true)
 
 	current_stage = way[current_key]
@@ -374,8 +375,7 @@ func _input(event):
 func next_question(answer):
 	
 	current_key = current_stage[answer];
-	
-	print(current_state);
+
 	if(current_state   == "war"):
 		next_war_question(current_key);
 	elif(current_state == "build"):
@@ -420,7 +420,7 @@ func next_question(answer):
 	pass
 
 func next_war_question(current_key):
-	print(current_key);
+
 	if(current_key == "attack"):
 		enemy_defense = enemy_defense - resources["army"];
 	if(current_key == "defense"):
@@ -498,7 +498,6 @@ func build(building_key):
 			buildings["peace"][building_key]["build"] = true;
 			building = buildings["peace"][building_key];
 
-		print(building);print(building_key);
 		get_node(building["node"]).show();
 		get_node(building["node"]).get_node("anim_blink").play("blink")
 		if(building.has("resources")):

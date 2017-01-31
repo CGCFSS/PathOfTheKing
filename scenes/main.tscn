@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=1]
+[gd_scene load_steps=38 format=1]
 
 [ext_resource path="res://scripts/main.gd" type="Script" id=1]
 [ext_resource path="res://fonts/blackchancery/blackchancery.fnt" type="BitmapFont" id=2]
@@ -32,6 +32,7 @@
 [ext_resource path="res://sound/hammering.wav" type="Sample" id=30]
 [ext_resource path="res://sound/sharpie.wav" type="Sample" id=31]
 [ext_resource path="res://sound/sword.wav" type="Sample" id=32]
+[ext_resource path="res://sound/forest.ogg" type="AudioStream" id=33]
 
 [sub_resource type="Animation" id=1]
 
@@ -385,7 +386,7 @@ autoplay = ""
 transform/pos = Vector2( 409.374, -175.452 )
 frames = SubResource( 2 )
 animation = "default"
-frame = 10
+frame = 6
 playing = true
 
 [node name="forge" type="Node2D" parent="."]
@@ -398,7 +399,6 @@ __meta__ = { "_edit_lock_":true }
 
 frames = SubResource( 3 )
 animation = "default"
-frame = 2
 playing = true
 __meta__ = { "_edit_lock_":true }
 
@@ -559,9 +559,9 @@ default/chorus_send = 0.0
 
 config/polyphony = 1
 config/samples = SubResource( 4 )
-default/volume_db = 0.0
+default/volume_db = 0.3
 default/pitch_scale = 1.0
-default/pan = 0.0
+default/pan = 0.3
 default/depth = 0.0
 default/height = 0.0
 default/filter/type = 0
@@ -588,6 +588,17 @@ default/filter/gain = 1.0
 default/reverb_room = 2
 default/reverb_send = 0.0
 default/chorus_send = 0.0
+
+[node name="soundtrack" type="StreamPlayer" parent="."]
+
+stream/stream = ExtResource( 33 )
+stream/play = false
+stream/loop = false
+stream/volume_db = 0.0
+stream/autoplay = false
+stream/paused = false
+stream/loop_restart_time = 0.0
+stream/buffering_ms = 500
 
 [node name="help1" type="Label" parent="."]
 
@@ -625,5 +636,6 @@ text = "=>"
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
+__meta__ = { "_edit_lock_":true }
 
 
