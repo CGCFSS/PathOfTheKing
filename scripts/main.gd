@@ -11,10 +11,10 @@ var way = {
 					},
 				2 : {
 							"text"  	 : "Everything is good!", 
-							"left_text"  : "build",
-							"right_text" : "People",
-							'left'       : 3,
-							'right' 	 : 4,
+							"left_text"  : "Build",
+							"right_text" : "Nothing",
+							'left'       : "build",
+							'right' 	 : 0,
 							"new_season" : 1,
 					},
 				3 : {
@@ -56,9 +56,15 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money"   : "-20",
-								"loyalty" : "-20",
-							},
+							 	"left" : {
+							 		"money"   : "+20",
+									"loyalty" : "-20",
+							 	},
+								"right" : {
+							 		"money"   : "-20",
+									"loyalty" : "+20",
+							 	},
+						},
 				},
 				7 : {
 						"text"  	 : "My lord, this season a good harvest!", 
@@ -78,9 +84,11 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money"   : "+20",
-								"loyalty" : "+20",
-							},
+							 	"left" : {
+							 		"money"   : "+10",
+									"loyalty" : "-10",
+							 	},
+						},
 				},
 				9 : {
 						"text"  	 : "My lord, you want to reduce taxes?", 
@@ -89,9 +97,11 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money"   : "+20",
-								"loyalty" : "+20",
-							},
+							 	"left" : {
+							 		"money"   : "-10",
+									"loyalty" : "+10",
+							 	},
+						},
 				},
 				10 : {
 						"text"  	 : "My lord, people bored, need to change the tax!", 
@@ -100,9 +110,15 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money"   : "+20",
-								"loyalty" : "+20",
-							},
+							 	"left" : {
+							 		"money"   : "+10",
+									"loyalty" : "-10",
+							 	},
+							 	"right" : {
+							 		"money"   : "-10",
+									"loyalty" : "+10",
+							 	},
+						},
 				},
 				11 : {
 						"text"  	 : "My lord, today is a holiday. Everybody the fun and do not work!", 
@@ -111,8 +127,8 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money"   : "-20",
-								"loyalty" : "+20",
+								"money"   : "-10",
+								"loyalty" : "+10",
 							},
 				},
 				12 : {
@@ -122,9 +138,14 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money"   : "-20",
-								"loyalty" : "+20",
-							},
+							 	"left" : {
+									"loyalty" : "-10",
+							 	},
+							 	"right" : {
+							 		"money"   : "-5",
+									"loyalty" : "+10",
+							 	},
+						},
 				},
 				13 : {
 						"text"  	 : "My lord, the epidemic occurred!", 
@@ -135,7 +156,7 @@ var way = {
 						"resources"  : {
 								"money"   : "-40",
 								"loyalty" : "-40",
-							},
+						},
 				},
 				14 : {
 						"text"  	 : "My lord, the people gave you a gift!", 
@@ -156,7 +177,7 @@ var way = {
 						'right' : 0,
 						"resources"  : {
 								"loyalty" : "-10",
-							},
+						},
 				},
 				16 : {
 						"text"  	 : "My lord, you want to organize a militia?", 
@@ -165,8 +186,12 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"loyalty" : "-10",
-							},
+							 	"left" : {
+							 		"money" : "-20",
+									"army"  : "+10",
+									"armor" : "+10",
+							 	},
+						},
 				},
 				17 : {
 						"text"  	 : "My lord, someone robbed the treasury!", 
@@ -185,8 +210,15 @@ var way = {
 						'left'  : 0,
 						'right' : 0,
 						"resources"  : {
-								"money" : "-30",
-							},
+							 	"left" : {
+									"money"   : "-15",
+									"loyalty" : "+15",
+							 	},
+							 	"right" : {
+							 		"army"    : "-10",
+									"loyalty" : "-10",
+							 	},
+						},
 				},
 			};
 
@@ -322,8 +354,10 @@ func next_question(answer):
 		next_war_question(current_key);
 	elif(current_state == "build"):
 		build(current_key);
+		current_state = "peace";
+		random_event();
 	else:
-		if(current_key  == "war"):
+		if(str(current_key) == "war"):
 
 			current_state = "war";	
 			current_stage = war_way[0];
@@ -332,19 +366,20 @@ func next_question(answer):
 			get_node("war_hud").get_node("enemy_power").set_text(str(enemy_power));
 			get_node("war_hud").get_node("enemy_defense").set_text(str(enemy_defense));
 
-		elif(current_key == "build"):
-
+		elif(str(current_key) == "build"):
 			current_state = "build";
-			get_buildings();
+			current_stage = get_buildings();
 
-		else:
-			if(season == 4):
+		elif(typeof(current_key) == TYPE_INT):
+			if(current_stage.has("resources") && current_stage["resources"].has(answer)):
+				calc_resources(current_stage["resources"][answer]);
+			if(season == 3):
 				random_event();
 			else:
 				current_stage = way[current_key];
 	
-	if(current_stage.has("resources")):
-		calc_resources(current_stage["resources"]);
+	if(current_stage.has("resources") && !current_stage["resources"].has("left") && !current_stage["resources"].has("right")):
+			calc_resources(current_stage["resources"]);
 
 	if(current_stage.has("unbuild")):
 		unbuild(current_stage["unbuild"]);
@@ -368,7 +403,7 @@ func next_war_question(current_key):
 	if(enemy_defense <= 0):
 		get_node("war_hud").hide();
 		get_node("peace_hud").show();
-		current_stage = "peace";
+		current_state = "peace";
 		current_stage = way[0];
 		enemy_defense = 100;
 		enemy_defense = 100;
@@ -383,12 +418,13 @@ func print_text():
 	var nodeLabel = get_node("main_text");
 	nodeLabel.set_visible_characters(-1)
 	label = nodeLabel.set_text(current_stage["text"]);
+	get_node("player").play("sharpie");
 	while nodeLabel.get_total_character_count() > nodeLabel.get_visible_characters():
 		nodeLabel.set_visible_characters(nodeLabel.get_visible_characters() + 1)
 		timer.set_wait_time(text_speed)
 		timer.start()
 		yield(timer, "timeout")
-
+	get_node("player").stop_all();	
 	get_node("left").set_text(current_stage["left_text"]);
 	get_node("right").set_text(current_stage["right_text"]);
 
@@ -397,7 +433,7 @@ func print_text():
 
 func next_season():
 	season = season + 1;
-	if(season > 4):
+	if(season > 3):
 		season = 1;
 		war_chance = war_chance + 1;
 	get_node("season").set_text(str(season));	
@@ -409,41 +445,57 @@ func random_event():
 	var event    = events[eventKey];
 
 	current_stage = way[event];
-	if(current_stage.has("resources")):
-		calc_resources(current_stage["resources"]);
-
-	print_text();
-
+	next_season();
+	
 	pass
 
 func build(building_key):
-	buildings[building_key]["build"] = true;
-	var building 	 = buildings[building_key];
-	get_node(building["node"]).show();
-	get_node(building["node"]).get_node("anim_blink").play("blink")
-	if(building.has("resources")):
-		calc_resources(building["resources"]);
+	var building
+
+	if(building_key != "-1"):
+		if(buildings["war"].has(building_key)):
+			buildings["war"][building_key]["build"] = true;
+			building = buildings["war"][building_key];
+		if(buildings["peace"].has(building_key)):
+			buildings["peace"][building_key]["build"] = true;
+			building = buildings["peace"][building_key];
+
+		print(building);print(building_key);
+		get_node(building["node"]).show();
+		get_node(building["node"]).get_node("anim_blink").play("blink")
+		if(building.has("resources")):
+			calc_resources(building["resources"]);
 
 	pass
 
 func get_buildings():
-	var war_building;
-	var peace_building;
+	var war_building   = null;
+	var peace_building = null;
 
 	for builging in buildings["war"]:
-		if(!builging["build"]):
-			war_building = builging;
+		if(!buildings["war"][builging].has("build")):
+			war_building = buildings["war"][builging];
 			break;
+	if(war_building == null):
+		war_building = {
+			"name" : "Nothing.",
+			"node" : "-1",
+		}			
 
 	for builging in buildings["peace"]:
-		if(!builging["build"]):
-			peace_building = builging;
+		if(!buildings["peace"][builging].has("build")):
+			peace_building = buildings["peace"][builging];
 			break;
+	if(peace_building == null):	
+		peace_building = {
+			"name" : "Nothing.",
+			"node" : "-1",
+		}
 
 	return  {
 				"text"  	 : "What do you want build?", 
-				"left_text"  : war_building["text"],
-				"right_text" : peace_building["text"],
+				"left_text"  : war_building["name"],
+				"right_text" : peace_building["name"],
 				'left'   	 : war_building["node"],
 				'right'  	 : peace_building["node"],
 				"new_season" : 1,
@@ -458,6 +510,11 @@ func unbuild(building_key):
 func calc_resources(new_resources):
 	for key in new_resources:
 		resources[key] = resources[key] + int(new_resources[key]);
-		if(get_node(key)):
+
+		if(key == 'loyalty' || key == 'money'):
+			get_node('peace_hud').get_node(key).set_text(str(resources[key]));
+		elif(key == 'enemy_defense' || key == 'enemy_power'):
+			get_node('war_hud').get_node(key).set_text(str(resources[key]));
+		elif(get_node(key)):
 			get_node(key).set_text(str(resources[key]));
 	pass
